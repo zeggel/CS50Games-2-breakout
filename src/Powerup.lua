@@ -5,6 +5,7 @@ function Powerup:init(skin)
     self.height = 16
 
     self.dy = 30
+    self.active = false
 
     self.skin = skin
     
@@ -14,10 +15,13 @@ end
 function Powerup:reset()
     self.x = math.random(VIRTUAL_WIDTH - self.width)
     self.y = -self.height
+    self.active = false
 end
 
 function Powerup:update(dt)
-    self.y = self.y + self.dy * dt
+    if self.active then
+        self.y = self.y + self.dy * dt
+    end
 end
 
 function Powerup:collides(target)

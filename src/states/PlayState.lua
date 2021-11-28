@@ -16,6 +16,8 @@
 
 PlayState = Class{__includes = BaseState}
 
+local TOTAL_BREAKS_BEFORE_POWERUP = 3
+
 --[[
     We initialize what's in our PlayState via a state table that we pass between
     states as we go from playing to serving.
@@ -29,8 +31,9 @@ function PlayState:enter(params)
     self.balls = {params.ball}
     self.ballsCount = 1
     self.level = params.level
-    self.powerup = Powerup(9)
 
+    self.powerup = Powerup(9)
+    self.breaksBeforePowerup = TOTAL_BREAKS_BEFORE_POWERUP
     self.recoverPoints = 5000
 
     -- give ball random starting velocity
@@ -94,6 +97,11 @@ function PlayState:update(dt)
 
                 -- trigger the brick's hit function, which removes it from play
                 brick:hit()
+
+                -- reduce breaks count for powerup
+                if not self.powerup.active and not brick.inPlay then
+                    self.breaksBeforePowerup = self.breaksBeforePowerup - 1
+                end
 
                 -- if we have enough points, recover a point of health
                 if self.score > self.recoverPoints then
@@ -173,6 +181,11 @@ function PlayState:update(dt)
         end
     end
 
+    if self.breaksBeforePowerup == 0 then
+        self.powerup.active = true
+        self.breaksBeforePowerup = TOTAL_BREAKS_BEFORE_POWERUP
+    end
+
     if self.powerup:collides(self.paddle) then
         gSounds['select']:play()
         self.powerup:reset()
@@ -185,6 +198,7 @@ function PlayState:update(dt)
             table.insert(self.balls, newBall)
             self.ballsCount = self.ballsCount + 1
         end
+        self.powerup:reset()
     end
 
     if self.powerup.y >= VIRTUAL_HEIGHT then
