@@ -15,6 +15,8 @@
 
 Paddle = Class{}
 
+local WIDTHS = {32, 64, 128, 160}
+
 --[[
     Our Paddle will initialize at the same spot every time, in the middle
     of the world horizontally, toward the bottom.
@@ -65,6 +67,16 @@ function Paddle:update(dt)
     else
         self.x = math.min(VIRTUAL_WIDTH - self.width, self.x + self.dx * dt)
     end
+end
+
+function Paddle:shrink()
+    self.size = math.max(1, self.size - 1)
+    self.width = WIDTHS[self.size]
+end
+
+function Paddle:grow()
+    self.size = math.min(4, self.size + 1)
+    self.width = WIDTHS[self.size]
 end
 
 --[[
