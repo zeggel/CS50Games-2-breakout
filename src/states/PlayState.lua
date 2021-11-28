@@ -29,6 +29,7 @@ function PlayState:enter(params)
     self.balls = {params.ball}
     self.ballsCount = 1
     self.level = params.level
+    self.powerup = Powerup(9)
 
     self.recoverPoints = 5000
 
@@ -205,6 +206,8 @@ function PlayState:update(dt)
         end
     end
 
+    self.powerup:update(dt)
+
     -- for rendering particle systems
     for k, brick in pairs(self.bricks) do
         brick:update(dt)
@@ -230,6 +233,8 @@ function PlayState:render()
     for k, ball in pairs(self.balls) do
         ball:render()
     end
+
+    self.powerup:render()
 
     renderScore(self.score)
     renderHealth(self.health)
