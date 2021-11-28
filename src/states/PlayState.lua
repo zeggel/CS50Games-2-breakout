@@ -17,6 +17,7 @@
 PlayState = Class{__includes = BaseState}
 
 local TOTAL_BREAKS_BEFORE_POWERUP = 3
+local TOTAL_SECONDS_BEFORE_POWERUP = 60
 
 --[[
     We initialize what's in our PlayState via a state table that we pass between
@@ -34,6 +35,7 @@ function PlayState:enter(params)
 
     self.powerup = Powerup(9)
     self.breaksBeforePowerup = TOTAL_BREAKS_BEFORE_POWERUP
+    self.secondsBeforePowerup = TOTAL_SECONDS_BEFORE_POWERUP
     self.recoverPoints = 5000
 
     -- give ball random starting velocity
@@ -181,9 +183,14 @@ function PlayState:update(dt)
         end
     end
 
-    if self.breaksBeforePowerup == 0 then
+    if not self.powerup.active then
+        self.secondsBeforePowerup = self.secondsBeforePowerup - love.timer.getDelta()
+    end
+
+    if self.secondsBeforePowerup <= 0 or self.breaksBeforePowerup == 0 then
         self.powerup.active = true
         self.breaksBeforePowerup = TOTAL_BREAKS_BEFORE_POWERUP
+        self.secondsBeforePowerup = TOTAL_SECONDS_BEFORE_POWERUP
     end
 
     if self.powerup:collides(self.paddle) then
