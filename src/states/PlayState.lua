@@ -173,6 +173,24 @@ function PlayState:update(dt)
         end
     end
 
+    if self.powerup:collides(self.paddle) then
+        gSounds['select']:play()
+        self.powerup:reset()
+        local sourceBall = self.balls[1]
+        for i = 0, 1 do
+            local newBall = Ball(math.random(7))
+            newBall:reset()
+            newBall.dx = math.random(-200, 200)
+            newBall.dy = math.random(-50, -60)
+            table.insert(self.balls, newBall)
+            self.ballsCount = self.ballsCount + 1
+        end
+    end
+
+    if self.powerup.y >= VIRTUAL_HEIGHT then
+        self.powerup:reset()
+    end
+
     -- if ball goes below bounds, revert to serve state and decrease health
     local filteredBalls = {}
     for k, ball in pairs(self.balls) do
