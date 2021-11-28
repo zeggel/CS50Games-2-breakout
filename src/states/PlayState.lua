@@ -37,6 +37,7 @@ function PlayState:enter(params)
     self.breaksBeforePowerup = TOTAL_BREAKS_BEFORE_POWERUP
     self.secondsBeforePowerup = TOTAL_SECONDS_BEFORE_POWERUP
     self.recoverPoints = 5000
+    self.growPoints = 1000
 
     -- give ball random starting velocity
     for k, ball in pairs(self.balls) do
@@ -115,6 +116,14 @@ function PlayState:update(dt)
 
                     -- play recover sound effect
                     gSounds['recover']:play()
+                end
+
+                -- if we have enough points, grow paddle
+                if self.score > self.growPoints then
+                    self.paddle:grow()
+                    
+                    -- multiply grow points by 2
+                    self.growPoints = self.growPoints + math.min(100000, self.growPoints * 2)
                 end
 
                 -- go to our victory screen if there are no more bricks left
@@ -196,7 +205,6 @@ function PlayState:update(dt)
     if self.powerup:collides(self.paddle) then
         gSounds['select']:play()
         self.powerup:reset()
-        local sourceBall = self.balls[1]
         for i = 0, 1 do
             local newBall = Ball(math.random(7))
             newBall:reset()

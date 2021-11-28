@@ -15,7 +15,7 @@
 
 Paddle = Class{}
 
-local WIDTHS = {32, 64, 128, 160}
+local MIN_WIDTH = 32
 
 --[[
     Our Paddle will initialize at the same spot every time, in the middle
@@ -71,12 +71,12 @@ end
 
 function Paddle:shrink()
     self.size = math.max(1, self.size - 1)
-    self.width = WIDTHS[self.size]
+    self.width = self.size * MIN_WIDTH
 end
 
 function Paddle:grow()
     self.size = math.min(4, self.size + 1)
-    self.width = WIDTHS[self.size]
+    self.width = self.size * MIN_WIDTH
 end
 
 --[[
