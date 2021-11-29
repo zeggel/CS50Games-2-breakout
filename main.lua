@@ -30,7 +30,13 @@ require 'src/Dependencies'
     Called just once at the beginning of the game; used to set up
     game objects, variables, etc. and prepare the game world.
 ]]
-function love.load()
+function love.load(args)
+    if args[1] == '--test' then
+        local lu = require 'lib/luaunit'
+        require 'tests/Runner'
+        os.exit(lu.LuaUnit.run('--pattern', 'test'))
+    end
+
     -- set love's default filter to "nearest-neighbor", which essentially
     -- means there will be no filtering of pixels (blurriness), which is
     -- important for a nice crisp, 2D look
