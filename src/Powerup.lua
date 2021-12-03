@@ -1,26 +1,22 @@
 Powerup = Class{}
 
-function Powerup:init(skin)
+function Powerup:init(type, x, y)
+    self.x = x
+    self.y = y
     self.width = 16
     self.height = 16
 
     self.dy = 30
-    self.active = false
+    self.activated = false
+    self.outOfScreen = false
 
-    self.skin = skin
-    
-    self:reset()
-end
-
-function Powerup:reset()
-    self.x = math.random(VIRTUAL_WIDTH - self.width)
-    self.y = -self.height
-    self.active = false
+    self.type = type
 end
 
 function Powerup:update(dt)
-    if self.active then
-        self.y = self.y + self.dy * dt
+    self.y = self.y + self.dy * dt
+    if self.y > VIRTUAL_HEIGHT then
+        self.outOfScreen = true
     end
 end
 
@@ -42,6 +38,6 @@ function Powerup:collides(target)
 end
 
 function Powerup:render()
-    love.graphics.draw(gTextures['main'], gFrames['powerups'][self.skin],
+    love.graphics.draw(gTextures['main'], gFrames['powerups'][self.type],
         self.x, self.y)
 end
