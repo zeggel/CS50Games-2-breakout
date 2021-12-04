@@ -16,7 +16,6 @@
 
 PlayState = Class{__includes = BaseState}
 
-local TOTAL_BREAKS_BEFORE_POWERUP = 3
 local TOTAL_SECONDS_BEFORE_POWERUP = 60
 
 --[[
@@ -34,7 +33,6 @@ function PlayState:enter(params)
     self.level = params.level
 
     self.powerups = {}
-    self.breaksBeforePowerup = TOTAL_BREAKS_BEFORE_POWERUP
     self.secondsBeforePowerup = TOTAL_SECONDS_BEFORE_POWERUP
     self.recoverPoints = 5000
 
@@ -81,7 +79,14 @@ function PlayState:update(dt)
                 self.score = self.score + (brick.tier * 200 + brick.color * 25)
 
                 -- trigger the brick's hit function, which removes it from play
-                brick:hit()
+                if brick.blocked then
+                    if ball.hasKey then
+                        ball.hasKey = false
+                        brick:hit()
+                    end
+                else
+                    brick:hit()
+                end
 
                 -- if we have enough points, recover a point of health
                 if self.score > self.recoverPoints then
@@ -108,7 +113,8 @@ function PlayState:update(dt)
 
                 -- Spawns powerup
                 if not brick.inPlay then
-                    self:spawnPowerup(brick)
+                    self:spawnBrickPowerup(brick)
+                    self.secondsBeforePowerup = TOTAL_SECONDS_BEFORE_POWERUP
                 end
 
                 --
@@ -162,10 +168,6 @@ function PlayState:update(dt)
         end
     end
 
-    -- if not self.powerup.active then
-    --     self.secondsBeforePowerup = self.secondsBeforePowerup - love.timer.getDelta()
-    -- end
-
     -- if ball goes below bounds, revert to serve state and decrease health
     local filteredBalls = {}
     for k, ball in pairs(self.balls) do
@@ -199,13 +201,18 @@ function PlayState:update(dt)
         end
     end
 
+    self.secondsBeforePowerup = self.secondsBeforePowerup - dt
+    if self.secondsBeforePowerup < 0 then
+        self.secondsBeforePowerup = TOTAL_SECONDS_BEFORE_POWERUP
+        self:spawnTimePowerup()
+    end
+
     for _, powerup in pairs(self.powerups) do
         powerup:update(dt)
         if powerup:collides(self.paddle) then
             self:activatePowerup(powerup)
         end
     end
-
     self:filterPowerups()
 
     -- for rendering particle systems
@@ -279,6 +286,10 @@ function PlayState:activatePowerup(powerup)
         self.paddle:grow()
     elseif powerup.type == 9 then
         self:spawnExtraBalls(2)
+    elseif powerup.type == 10 then
+        for _, ball in pairs(self.balls) do
+            ball.hasKey = true
+        end
     end
     powerup.activated = true
     gSounds['select']:play()
@@ -286,7 +297,7 @@ end
 
 function PlayState:spawnExtraBalls(count)
     for i = 1, count do
-        local newBall = Ball(math.random(7))
+        local newBall = Ball(math.random(4))
         newBall:reset()
         newBall.dx = math.random(-200, 200)
         newBall.dy = math.random(-50, -60)
@@ -305,7 +316,7 @@ function PlayState:filterPowerups()
     self.powerups = filtered
 end
 
-function PlayState:spawnPowerup(brick)
+function PlayState:spawnBrickPowerup(brick)
     local function generateType()
         local probability = math.random(100)
         if probability < 15 then
@@ -322,6 +333,8 @@ function PlayState:spawnPowerup(brick)
             return 6
         elseif probability < 45 then
             return 9
+        elseif probability < 60 and self:hasBlockedBrick() then
+            return 10
         end
 
         return 0
@@ -332,6 +345,25 @@ function PlayState:spawnPowerup(brick)
         local powerupX = brick.x + 8
         table.insert(self.powerups, Powerup(powerupType, powerupX, brick.y))
     end
+end
+
+function PlayState:spawnTimePowerup()
+    local types = {5, 8, 9}
+    if self.hasBlockedBrick() then
+        table.insert(types, 10)
+    end
+    local powerupType = types[math.random(#types)]
+    local powerupX = math.random(20, VIRTUAL_WIDTH - 20)
+    table.insert(self.powerups, Powerup(powerupType, powerupX, -20))
+end
+
+function PlayState:hasBlockedBrick()
+    for _, brick in pairs(self.bricks) do
+        if brick.blocked then
+            return true
+        end
+    end
+    return false
 end
 
 function PlayState:checkVictory()

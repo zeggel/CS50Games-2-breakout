@@ -25,6 +25,8 @@ function Ball:init(skin)
     self.dy = 0
     self.dx = 0
 
+    self.hasKey = false
+
     -- this will effectively be the color of our ball, and we will index
     -- our table of Quads relating to the global block texture using this
     self.skin = skin
@@ -59,6 +61,7 @@ function Ball:reset()
     self.y = VIRTUAL_HEIGHT / 2 - 2
     self.dx = 0
     self.dy = 0
+    self.hasKey = false
 end
 
 function Ball:update(dt)

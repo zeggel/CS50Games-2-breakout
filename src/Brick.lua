@@ -63,6 +63,8 @@ function Brick:init(x, y)
     -- used to determine whether this brick should be rendered
     self.inPlay = true
 
+    self.blocked = false
+
     -- particle system belonging to the brick, emitted on hit
     self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)
 
