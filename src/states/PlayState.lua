@@ -273,6 +273,10 @@ function PlayState:activatePowerup(powerup)
         for _, ball in pairs(self.balls) do
             ball:decreaseSpeed()
         end
+    elseif powerup.type == 7 then
+        self.paddle:shrink()
+    elseif powerup.type == 8 then
+        self.paddle:grow()
     elseif powerup.type == 9 then
         self:spawnExtraBalls(2)
     end
