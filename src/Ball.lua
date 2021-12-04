@@ -104,6 +104,16 @@ function Ball:interactWithPaddle(paddle)
     end
 end
 
+function Ball:increaseSpeed()
+    self.dx = math.floor(self.dx * 1.1)
+    self.dy = math.floor(self.dy * 1.1)
+end
+
+function Ball:decreaseSpeed()
+    self.dx = math.ceil(self.dx * 0.9)
+    self.dy = math.ceil(self.dy * 0.9)
+end
+
 function Ball:render()
     -- gTexture is our global texture for all blocks
     -- gBallFrames is a table of quads mapping to each individual ball skin in the texture
