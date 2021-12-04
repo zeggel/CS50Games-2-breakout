@@ -37,7 +37,6 @@ function PlayState:enter(params)
     self.breaksBeforePowerup = TOTAL_BREAKS_BEFORE_POWERUP
     self.secondsBeforePowerup = TOTAL_SECONDS_BEFORE_POWERUP
     self.recoverPoints = 5000
-    self.growPoints = 1000
 
     -- give ball random starting velocity
     for k, ball in pairs(self.balls) do
@@ -96,14 +95,6 @@ function PlayState:update(dt)
                     gSounds['recover']:play()
                 end
 
-                -- if we have enough points, grow paddle
-                if self.score > self.growPoints then
-                    self.paddle:grow()
-                    
-                    -- multiply grow points by 2
-                    self.growPoints = self.growPoints + math.min(100000, self.growPoints * 2)
-                end
-
                 -- go to our victory screen if there are no more bricks left
                 if self:checkVictory() then
                     gSounds['victory']:play()
@@ -121,8 +112,7 @@ function PlayState:update(dt)
 
                 -- Spawns powerup
                 if not brick.inPlay then
-                    local powerupX = brick.x + 8
-                    table.insert(self.powerups, Powerup(9, powerupX, brick.y))
+                    self:spawnPowerup(brick)
                 end
 
                 --
@@ -192,26 +182,7 @@ function PlayState:update(dt)
     self.balls = filteredBalls
 
     if self.ballsCount == 0 then
-        self.health = self.health - 1
-        gSounds['hurt']:play()
-
-        if self.health == 0 then
-            gStateMachine:change('game-over', {
-                score = self.score,
-                highScores = self.highScores
-            })
-        else
-            self.paddle:shrink()
-            gStateMachine:change('serve', {
-                paddle = self.paddle,
-                bricks = self.bricks,
-                health = self.health,
-                score = self.score,
-                highScores = self.highScores,
-                level = self.level,
-                recoverPoints = self.recoverPoints
-            })
-        end
+        self:loseHealth()
     end
 
     for _, powerup in pairs(self.powerups) do
@@ -263,8 +234,35 @@ function PlayState:render()
     end
 end
 
+function PlayState:loseHealth()
+    self.health = self.health - 1
+    gSounds['hurt']:play()
+
+    if self.health == 0 then
+        gStateMachine:change('game-over', {
+            score = self.score,
+            highScores = self.highScores
+        })
+    else
+        self.paddle:reset()
+        gStateMachine:change('serve', {
+            paddle = self.paddle,
+            bricks = self.bricks,
+            health = self.health,
+            score = self.score,
+            highScores = self.highScores,
+            level = self.level,
+            recoverPoints = self.recoverPoints
+        })
+    end
+end
+
 function PlayState:activatePowerup(powerup)
-    if powerup.type == 9 then
+    if powerup.type == 3 then
+        self.health = math.min(3, self.health + 1)
+    elseif powerup.type == 4 then
+        self:loseHealth()
+    elseif powerup.type == 9 then
         self:spawnExtraBalls(2)
     end
     powerup.activated = true
@@ -290,6 +288,35 @@ function PlayState:filterPowerups()
         end
     end
     self.powerups = filtered
+end
+
+function PlayState:spawnPowerup(brick)
+    local function generateType()
+        local probability = math.random(100)
+        if probability < 15 then
+            return 3
+        elseif probability < 20 then
+            return 4
+        elseif probability < 25 then
+            return 7
+        elseif probability < 30 then
+            return 8
+        elseif probability < 35 then
+            return 5
+        elseif probability < 40 then
+            return 6
+        elseif probability < 45 then
+            return 9
+        end
+
+        return 0
+    end
+
+    local powerupType = generateType()
+    if powerupType > 0 then
+        local powerupX = brick.x + 8
+        table.insert(self.powerups, Powerup(powerupType, powerupX, brick.y))
+    end
 end
 
 function PlayState:checkVictory()
