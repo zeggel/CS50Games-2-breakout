@@ -75,17 +75,18 @@ function PlayState:update(dt)
             -- only check collision if we're in play
             if brick.inPlay and ball:collides(brick) then
 
-                -- add to score
-                self.score = self.score + (brick.tier * 200 + brick.color * 25)
-
                 -- trigger the brick's hit function, which removes it from play
                 if brick.blocked then
                     if ball.hasKey then
                         ball.hasKey = false
                         brick.blocked = false
-                        brick:hit()
+                        
+                        self.score = self.score + 100
                     end
                 else
+                    -- add to score
+                    self.score = self.score + (brick.tier * 200 + brick.color * 25)
+
                     brick:hit()
                 end
 
