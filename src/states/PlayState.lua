@@ -334,7 +334,7 @@ function PlayState:spawnBrickPowerup(brick)
             return 6
         elseif probability < 45 then
             return 9
-        elseif probability < 60 and self:hasBlockedBrick() then
+        elseif probability < 90 and self:hasBlockedBrick() then
             return 10
         end
 

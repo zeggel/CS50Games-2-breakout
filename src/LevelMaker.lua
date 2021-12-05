@@ -114,7 +114,7 @@ function LevelMaker.createMap(level)
                 b.tier = solidTier
             end
 
-            if y == rowWithBlocked then
+            if y == rowWithBlocked and (skipPattern or x % 2 ~= 0) then
                 b.blocked = true
             end
 
