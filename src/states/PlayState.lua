@@ -212,7 +212,7 @@ function PlayState:update(dt)
 
     for _, powerup in pairs(self.powerups) do
         powerup:update(dt)
-        if powerup:collides(self.paddle) then
+        if not powerup.activated and powerup:collides(self.paddle) then
             self.score = self.score + powerup.score
             self:activatePowerup(powerup)
         end
@@ -247,6 +247,7 @@ function PlayState:render()
 
     for _, powerup in pairs(self.powerups) do
         powerup:render()
+        powerup:renderParticles()
     end
 
     renderScore(self.score)
@@ -295,8 +296,8 @@ function PlayState:activatePowerup(powerup)
             ball.hasKey = true
         end
     end
-    powerup.activated = true
-    gSounds['select']:play()
+
+    powerup:activate()
 end
 
 function PlayState:spawnExtraBalls(count)
@@ -313,7 +314,7 @@ end
 function PlayState:filterPowerups()
     local filtered = {}
     for _, powerup in pairs(self.powerups) do
-        if not powerup.activated and not powerup.outOfScreen then
+        if not powerup.outOfScreen then
             table.insert(filtered, powerup)
         end
     end
