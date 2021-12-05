@@ -120,7 +120,11 @@ function Brick:hit()
 end
 
 function Brick:unlock()
+    -- Set color to 5 (gold) before emit, for gold particles color, then back color
+    local originalColor = self.color
+    self.color = 5
     self:emit()
+    self.color = originalColor
 
     -- sound on hit
     gSounds['brick-hit-2']:stop()
