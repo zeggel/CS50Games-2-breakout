@@ -16,7 +16,7 @@
 
 PlayState = Class{__includes = BaseState}
 
-local TOTAL_SECONDS_BEFORE_POWERUP = 60
+local TOTAL_SECONDS_BEFORE_POWERUP = 20
 
 --[[
     We initialize what's in our PlayState via a state table that we pass between
@@ -82,6 +82,7 @@ function PlayState:update(dt)
                 if brick.blocked then
                     if ball.hasKey then
                         ball.hasKey = false
+                        brick.blocked = false
                         brick:hit()
                     end
                 else
@@ -348,11 +349,13 @@ function PlayState:spawnBrickPowerup(brick)
 end
 
 function PlayState:spawnTimePowerup()
-    local types = {5, 8, 9}
-    if self.hasBlockedBrick() then
-        table.insert(types, 10)
+    local powerupType
+    if self:hasBlockedBrick() then
+        powerupType = 10
+    else
+        local types = {5, 8, 9}
+        powerupType = types[math.random(#types)]
     end
-    local powerupType = types[math.random(#types)]
     local powerupX = math.random(20, VIRTUAL_WIDTH - 20)
     table.insert(self.powerups, Powerup(powerupType, powerupX, -20))
 end

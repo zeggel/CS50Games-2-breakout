@@ -36,6 +36,8 @@ function LevelMaker.createMap(level)
     -- randomly choose the number of rows
     local numRows = math.random(1, 5)
 
+    local rowWithBlocked = math.random(numRows)
+
     -- randomly choose the number of columns, ensuring odd
     local numCols = math.random(7, 13)
     numCols = numCols % 2 == 0 and (numCols + 1) or numCols
@@ -110,7 +112,11 @@ function LevelMaker.createMap(level)
             if not alternatePattern then
                 b.color = solidColor
                 b.tier = solidTier
-            end 
+            end
+
+            if y == rowWithBlocked then
+                b.blocked = true
+            end
 
             table.insert(bricks, b)
 
