@@ -87,20 +87,8 @@ end
     changing its color otherwise.
 ]]
 function Brick:hit()
-    -- set the particle system to interpolate between two colors; in this case, we give
-    -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
-    -- over the particle's lifetime (the second color)
-    self.psystem:setColors(
-        paletteColors[self.color].r / 255,
-        paletteColors[self.color].g / 255,
-        paletteColors[self.color].b / 255,
-        55 * (self.tier + 1) / 255,
-        paletteColors[self.color].r / 255,
-        paletteColors[self.color].g / 255,
-        paletteColors[self.color].b / 255,
-        0
-    )
-    self.psystem:emit(64)
+
+    self:emit()
 
     -- sound on hit
     gSounds['brick-hit-2']:stop()
@@ -129,6 +117,29 @@ function Brick:hit()
         gSounds['brick-hit-1']:stop()
         gSounds['brick-hit-1']:play()
     end
+end
+
+function Brick:unlock()
+    self:emit()
+
+    self.blocked = false
+end
+
+function Brick:emit()
+        -- set the particle system to interpolate between two colors; in this case, we give
+    -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
+    -- over the particle's lifetime (the second color)
+    self.psystem:setColors(
+        paletteColors[self.color].r / 255,
+        paletteColors[self.color].g / 255,
+        paletteColors[self.color].b / 255,
+        55 * (self.tier + 1) / 255,
+        paletteColors[self.color].r / 255,
+        paletteColors[self.color].g / 255,
+        paletteColors[self.color].b / 255,
+        0
+    )
+    self.psystem:emit(64)
 end
 
 function Brick:update(dt)

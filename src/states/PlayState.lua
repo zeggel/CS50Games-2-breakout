@@ -79,9 +79,10 @@ function PlayState:update(dt)
                 if brick.blocked then
                     if ball.hasKey then
                         ball.hasKey = false
-                        brick.blocked = false
                         
                         self.score = self.score + 100
+
+                        brick:unlock()
                     end
                 else
                     -- add to score
@@ -350,8 +351,17 @@ function PlayState:spawnBrickPowerup(brick)
 end
 
 function PlayState:spawnTimePowerup()
+    local function hasBallWithKey()
+        for _, ball in pairs(self.balls) do
+            if ball.hasKey then
+                return true
+            end
+        end
+        return false
+    end
+
     local powerupType
-    if self:hasBlockedBrick() then
+    if self:hasBlockedBrick() and not hasBallWithKey() then
         powerupType = 10
     else
         local types = {5, 8, 9}
