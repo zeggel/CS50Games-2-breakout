@@ -122,6 +122,10 @@ end
 function Brick:unlock()
     self:emit()
 
+    -- sound on hit
+    gSounds['brick-hit-2']:stop()
+    gSounds['brick-hit-2']:play()
+
     self.blocked = false
 end
 
