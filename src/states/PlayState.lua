@@ -213,6 +213,7 @@ function PlayState:update(dt)
     for _, powerup in pairs(self.powerups) do
         powerup:update(dt)
         if powerup:collides(self.paddle) then
+            self.score = self.score + powerup.score
             self:activatePowerup(powerup)
         end
     end

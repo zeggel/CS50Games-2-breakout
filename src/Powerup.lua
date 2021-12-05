@@ -11,6 +11,7 @@ function Powerup:init(type, x, y)
     self.outOfScreen = false
 
     self.type = type
+    self.score = 150
 end
 
 function Powerup:update(dt)
