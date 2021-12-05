@@ -36,7 +36,7 @@ function LevelMaker.createMap(level)
     -- randomly choose the number of rows
     local numRows = math.random(1, 5)
 
-    local rowWithBlocked = math.random(numRows)
+    local blockedRowNumbers = LevelMaker.getBlockedRowNumbers(numRows)
 
     -- randomly choose the number of columns, ensuring odd
     local numCols = math.random(7, 13)
@@ -114,7 +114,7 @@ function LevelMaker.createMap(level)
                 b.tier = solidTier
             end
 
-            if y == rowWithBlocked and (skipPattern or x % 2 ~= 0) then
+            if blockedRowNumbers[y] ~= nil and (skipPattern or x % 2 ~= 0) then
                 b.blocked = true
             end
 
@@ -131,4 +131,23 @@ function LevelMaker.createMap(level)
     else
         return bricks
     end
+end
+
+function LevelMaker.getBlockedRowNumbers(rowCount)
+    local maxBlockedRowsCount = math.floor(rowCount / 2)
+    if rowCount < 2 or maxBlockedRowsCount == 0 then
+        return {}
+    end
+    local blockedRowsCount = math.random(maxBlockedRowsCount)
+    local blockedRowsNumbers = {}
+
+    while blockedRowsCount > 0 do
+        local possibleRow = math.random(rowCount)
+        if blockedRowsNumbers[possibleRow] == nil then
+            blockedRowsNumbers[possibleRow] = true
+            blockedRowsCount = blockedRowsCount - 1
+        end
+    end
+
+    return blockedRowsNumbers
 end
