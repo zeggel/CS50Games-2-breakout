@@ -76,12 +76,28 @@ end
 
 function Paddle:shrink()
     self.size = math.max(1, self.size - 1)
-    self.width = self.size * MIN_WIDTH
+    local newWidth = self.size * MIN_WIDTH
+    local newX = self.x + math.floor((self.width - newWidth) / 2)
+
+    self.width = newWidth
+    self:setX(newX)
 end
 
 function Paddle:grow()
     self.size = math.min(4, self.size + 1)
-    self.width = self.size * MIN_WIDTH
+    local newWidth = self.size * MIN_WIDTH
+    local newX = self.x - math.floor((newWidth - self.width) / 2)
+
+    self.width = newWidth
+    self:setX(newX)
+end
+
+function Paddle:setX(x)
+    if x < 0 then
+        self.x = 0
+    else
+        self.x = math.min(VIRTUAL_WIDTH - self.width, x)
+    end
 end
 
 --[[
